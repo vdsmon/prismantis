@@ -408,7 +408,7 @@ export const register: Register = (on, options) => {
   })
 
   on('ui.render', { component: 'TurnDuration' }, async ($, e, next) => {
-    const at = style.clock === 'off' ? undefined : endedAt(await read($, turnEnds), e.props.durationMs, await firstDrawn($, e.requestId))
+    const at = style.clock === 'off' || !style.turnClock ? undefined : endedAt(await read($, turnEnds), e.props.durationMs, await firstDrawn($, e.requestId))
     const time = at === undefined ? undefined : clockText(at, await $.clock.now(), style.clock)
     if (style.turnLine === 'themed') return renderTurnDuration($.ui.resolve(e), style, e.props.word, e.props.durationMs, time)
     if (time === undefined) return next(e)
@@ -427,7 +427,7 @@ export const register: Register = (on, options) => {
   }
 
   on('turn.complete', async ($, e, next) => {
-    if (style.clock !== 'off' && e.agentId === undefined) {
+    if (style.clock !== 'off' && style.turnClock && e.agentId === undefined) {
       const at = await $.clock.now()
       await update($, turnEnds, list => withRecord(list, { durationMs: e.durationMs, at }))
     }

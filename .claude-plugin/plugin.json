@@ -1,6 +1,6 @@
 {
   "name": "prismantis",
-  "version": "0.15.10",
+  "version": "0.15.11",
   "description": "Colorful, themeable rendering for Claude Code replies: tables, headings, code, numbers, paths and links.",
   "author": {
     "name": "Nahum Litvin",
@@ -94,6 +94,12 @@
       "description": "Shows when you sent each prompt and when each turn finished. 24h: 14:32. 12h: 2:32 PM. A time from another day gets its date. off: no times.",
       "default": "off",
       "options": ["off", "24h", "12h"]
+    },
+    "turnClock": {
+      "type": "boolean",
+      "title": "Clock on the turn line",
+      "description": "With clock on, add when each turn finished to the line that closes it. Off keeps the times on your prompts only.",
+      "default": true
     },
     "turnLine": {
       "type": "string",
