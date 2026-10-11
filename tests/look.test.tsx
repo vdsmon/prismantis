@@ -2,6 +2,7 @@ import type { On } from 'claude-code'
 import { expect, mock, test } from 'claude-code/testing'
 
 import { PRESETS } from '../hooks/presets'
+import { withoutDelivered, withQueued } from '../hooks/queue'
 import { tint } from '../hooks/render'
 
 const t = PRESETS['catppuccin-mocha']
@@ -63,6 +64,43 @@ test('prompts stay on the left by default', async $ => {
   const bubble = (await ui.findAll({ type: 'Box' })).find(b => b.props.borderStyle === 'round')
   expect(bubble?.props.alignSelf).toBe('flex-start')
   await ui.unmount()
+})
+
+const queuedPrompt = (text: string) => ({ plugin: 'prismantis', surface: 'terminal' as const, component: 'UserMessage' as const, props: { text, origin: { kind: 'composer' } as never, isExpanded: true }, viewport: { columns: 80, rows: 10 } })
+const bubbleColor = async (ui: { findAll: (q: { type: string }) => Promise<{ props: { borderStyle?: unknown; borderColor?: unknown } }[]> }) =>
+  (await ui.findAll({ type: 'Box' })).find(b => b.props.borderStyle === 'round')?.props.borderColor
+const delivery = (text: string) => ({
+  message: { type: 'attachment' as const, name: 'queued_command', content: [{ type: 'text' as const, text: `<system-reminder>\nThe user sent a new message while you were working:\n${text}\n\nThis is how Claude Code surfaces messages.\n</system-reminder>` }] },
+}) as never
+
+test('dimQueued draws a prompt sent mid-turn in gray until it is delivered', { options: { dimQueued: true } }, async ($, on) => {
+  mock.env(on, {})
+  on('prompt.submit', (_, e) => ({ text: e.text }))
+  await $.prompt.submit({ text: 'queued test', wait: false, origin: { kind: 'composer' }, turnId: 't1' } as never)
+  const waiting = await $.ui.mount(queuedPrompt('queued test'))
+  expect(await bubbleColor(waiting)).toBe(t.codeComment)
+  expect((await waiting.find({ type: 'Text', text: /^queued test$/ }))?.props.color).toBe(t.codeComment)
+  await waiting.unmount()
+  await $.session.append(delivery('queued test'))
+  const read = await $.ui.mount(queuedPrompt('queued test'))
+  expect(await bubbleColor(read)).toBe(t.accent)
+  await read.unmount()
+})
+
+test('dimQueued leaves a prompt sent while idle, or with the option off, in full color', async ($, on) => {
+  mock.env(on, {})
+  on('prompt.submit', (_, e) => ({ text: e.text }))
+  await $.prompt.submit({ text: 'queued test', wait: false, origin: { kind: 'composer' }, turnId: 't1' } as never)
+  const ui = await $.ui.mount(queuedPrompt('queued test'))
+  expect(await bubbleColor(ui)).toBe(t.accent)
+  await ui.unmount()
+})
+
+test('queue helpers drop only the delivered prompt', () => {
+  const list = withQueued(withQueued([], 'first  one'), 'second')
+  expect(list).toEqual(['first one', 'second'])
+  expect(withoutDelivered(list, 'The user sent:\nsecond\n\nmore')).toEqual(['first one'])
+  expect(withoutDelivered(list, 'nothing here')).toEqual(list)
 })
 
 const local = (h: number, m: number) => new Date(2026, 9, 10, h, m).getTime()

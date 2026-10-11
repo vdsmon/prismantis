@@ -2,6 +2,7 @@ import { atom, read, update } from 'claude-code'
 import type { EngineInterface, Register, RenderElement, RenderInput, RenderSurface } from 'claude-code'
 
 import { clockText, endedAt, promptKey, sentAt, withRecord } from './clock'
+import { deliveredText, isQueued, withQueued, withoutDelivered } from './queue'
 import type { Table } from './tables'
 import { MAX_ROWS, PREVIEW_ROWS, captionOf, isTabular, markdownTable, tableFooter, toolTable } from './tables'
 import type { Formula } from './latex'
@@ -73,6 +74,7 @@ const latexDir = atom({ plugin: 'prismantis', key: 'dir' } as const, '')
 const unfolded = atom({ plugin: 'prismantis', key: 'unfolded' } as const, [] as string[])
 const sent = atom({ plugin: 'prismantis', key: 'sent' } as const, [])
 const turnEnds = atom({ plugin: 'prismantis', key: 'turnEnds' } as const, [])
+const queued = atom({ plugin: 'prismantis', key: 'queued' } as const, [] as string[])
 
 const firstDrawn = async ($: EngineInterface, id: string): Promise<number> => {
   const ref = { plugin: 'prismantis', key: 'drawn', id } as const
@@ -419,6 +421,17 @@ export const register: Register = (on, options) => {
     )
   })
 
+  if (style.dimQueued) {
+    on('session.append', async ($, e, next) => {
+      if (e.message.name === 'queued_command') await update($, queued, list => withoutDelivered(list, deliveredText(e.message.content)))
+      return next(e)
+    })
+    on('turn.start', async ($, e, next) => {
+      await update($, queued, () => [])
+      return next(e)
+    })
+  }
+
   on('turn.complete', async ($, e, next) => {
     if (style.clock !== 'off' && e.agentId === undefined) {
       const at = await $.clock.now()
@@ -428,6 +441,9 @@ export const register: Register = (on, options) => {
   })
 
   on('prompt.submit', async ($, e, next) => {
+    if (style.dimQueued && e.turnId !== undefined && (e.origin.kind === 'composer' || e.origin.kind === 'bridge')) {
+      await update($, queued, list => withQueued(list, e.text))
+    }
     if (style.clock !== 'off' && (e.origin.kind === 'composer' || e.origin.kind === 'bridge')) {
       const at = await $.clock.now()
       await update($, sent, list => withRecord(list, { text: promptKey(e.text), at }))
@@ -458,7 +474,8 @@ export const register: Register = (on, options) => {
     const at = style.clock === 'off' ? undefined : sentAt(await read($, sent), e.props.text, await firstDrawn($, e.requestId))
     const time = at === undefined ? undefined : clockText(at, await $.clock.now(), style.clock)
     if (style.promptStyle === 'off') return time === undefined ? next(e) : next({ ...e, props: { ...e.props, text: `[${time}] ${e.props.text}` } })
-    return renderUserPrompt($.ui.resolve(e), fit(e.viewport), e.props.text, columnsOf(e.viewport), time)
+    const waiting = style.dimQueued && isQueued(await read($, queued), e.props.text)
+    return renderUserPrompt($.ui.resolve(e), fit(e.viewport), e.props.text, columnsOf(e.viewport), time, waiting)
   })
 
   on('ui.render', { component: 'AssistantMessage' }, async ($, e, next) => {

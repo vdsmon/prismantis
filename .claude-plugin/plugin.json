@@ -1,6 +1,6 @@
 {
   "name": "prismantis",
-  "version": "0.15.7",
+  "version": "0.15.8",
   "description": "Colorful, themeable rendering for Claude Code replies: tables, headings, code, numbers, paths and links.",
   "author": {
     "name": "Nahum Litvin",
@@ -115,6 +115,12 @@
       "description": "The mark that tucks tool rows and results under Claude's sentence. hook: ⎿, as Claude Code draws it, which most fonts set at the bottom of the line. corner: a bold └─, which sits in the middle of the line.",
       "default": "hook",
       "options": ["hook", "corner"]
+    },
+    "dimQueued": {
+      "type": "boolean",
+      "title": "Dim queued prompts",
+      "description": "Draw a prompt you send while Claude is working in gray until Claude reads it. Needs a promptStyle other than off.",
+      "default": false
     },
     "replyGap": {
       "type": "boolean",
