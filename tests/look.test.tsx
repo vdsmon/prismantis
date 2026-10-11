@@ -2,6 +2,7 @@ import type { On } from 'claude-code'
 import { expect, mock, test } from 'claude-code/testing'
 
 import { PRESETS } from '../hooks/presets'
+import { endedAt } from '../hooks/clock'
 import { withoutDelivered, withQueued } from '../hooks/queue'
 import { tint } from '../hooks/render'
 
@@ -96,6 +97,12 @@ test('dimQueued leaves a prompt sent while idle, or with the option off, in full
   await ui.unmount()
 })
 
+test('a turn line takes no end time older than a minute before it was drawn', () => {
+  const ends = [{ durationMs: 5000, at: 1_000 }]
+  expect(endedAt(ends, 5000, 61_000)).toBe(1_000)
+  expect(endedAt(ends, 5000, 61_001)).toBeUndefined()
+})
+
 test('queue helpers drop only the delivered prompt', () => {
   const list = withQueued(withQueued([], 'first  one'), 'second')
   expect(list).toEqual(['first one', 'second'])
@@ -106,14 +113,14 @@ test('queue helpers drop only the delivered prompt', () => {
 const local = (h: number, m: number) => new Date(2026, 9, 10, h, m).getTime()
 const turnLine = { plugin: 'prismantis', surface: 'terminal' as const, component: 'TurnDuration' as const, props: { word: 'Crunched', durationMs: 5000 } }
 
-test('turnLine claude keeps the engine line and adds the clock time', { options: { turnLine: 'claude', clock: '24h' } }, async ($, on) => {
+test('turnLine claude draws the plain gray line with the clock time on the same line', { options: { turnLine: 'claude', clock: '24h' } }, async ($, on) => {
   engine(on)
   mock.clock(on, { now: local(7, 7) })
   on('turn.complete', async (_$, e) => ({ text: e.answer }))
   await $.turn.complete({ answer: 'done', durationMs: 5000, isAborted: false, turnId: 't1', reason: 'answer' })
   const ui = await $.ui.mount(turnLine)
-  expect(await ui.find({ type: 'Text', text: /^engine$/ })).toBeDefined()
-  expect((await ui.find({ type: 'Text', text: /^ · 07:07$/ }))?.props.dimColor).toBe(true)
+  expect((await ui.find({ type: 'Text', text: /^✻ Crunched for 5s · 07:07$/ }))?.props.dimColor).toBe(true)
+  expect(await ui.find({ type: 'Text', text: /^engine$/ })).toBeUndefined()
   await ui.unmount()
 })
 

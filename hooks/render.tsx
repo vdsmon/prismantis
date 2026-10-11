@@ -1272,6 +1272,10 @@ export const renderTurnDuration = ({ Text }: ElementTable, style: Style, word: s
   </Text>
 )
 
+export const renderPlainTurnDuration = ({ Text }: ElementTable, word: string, durationMs: number, time: string): RenderElement => (
+  <Text dimColor>{`✻ ${word} for ${formatDuration(durationMs)} · ${time}`}</Text>
+)
+
 export const renderUserPrompt = (el: ElementTable, style: Style, text: string, columns: number, time?: string, waiting = false): RenderElement => {
   const { Box, Text } = el
   const t = style.theme
