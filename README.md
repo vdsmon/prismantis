@@ -292,6 +292,8 @@ Options sit under `options`, keyed by the plugin's install name. Project setting
 | `replyGap` | `true`, `false` | `false` |
 | `treeMark` | `hook` (`⎿`), `corner` (`└─`, bold) | `hook` |
 | `toolOutput` | `full`, `quiet` | `full` |
+| `codeStyle` | `rule`, `box` | `rule` |
+| `consoleSplit` | `true`, `false` | `false` |
 | `diffCards` | `true`, `false` | `true` |
 | `diffBox` | `true`, `false` | `false` |
 | `diffSyntax` | `true`, `false` | `false` |

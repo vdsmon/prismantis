@@ -191,6 +191,28 @@ export const highlightBlock = ({ Text }: ElementTable, style: Style, lines: stri
   ))
 }
 
+const isSessionLang = (lang: string) => /^(console|shell-session|shellsession|terminal|sh-session)$/i.test(lang)
+
+const PROMPT = /^([$%]) (.*)$/
+
+export const sessionCommands = (lines: readonly string[]): string => {
+  const commands = lines.map(line => PROMPT.exec(line)?.[2]).filter((command): command is string => command !== undefined)
+  return (commands.length ? commands : lines).join('\n')
+}
+
+const sessionLine = (el: ElementTable, style: Style, line: string, key: string): RenderElement => {
+  const { Text } = el
+  const t = style.theme
+  const command = PROMPT.exec(line)
+  if (!command) return <Text key={key} color={t.codeText} dimColor>{line === '' ? ' ' : line}</Text>
+  return (
+    <Text key={key} color={t.codeText}>
+      <Text color={t.accent} bold>{`${command[1]} `}</Text>
+      {codeLine(el, style, command[2]!, 'bash', `${key}.c`)}
+    </Text>
+  )
+}
+
 const isShellLang = (lang: string) => lang === '' || /^(sh|bash|zsh|shell|console|fish|powershell|ps1)$/i.test(lang)
 
 export const codeLine = (el: ElementTable, style: Style, line: string, lang: string, key: string): RenderElement => {
@@ -563,17 +585,37 @@ export const renderBlocks = (el: ElementTable, style: Style, blocks: Block[], co
         const lines = block.lines
         const toggle = lines.length > FOLD_AT ? fold?.(codeId(lines), lines.length - FOLD_SHOW, `fold${b}`) : null
         const shown = toggle?.folded ? FOLD_SHOW : lines.length
-        const rows = (isShellLang(block.lang) ? null : highlightBlock(el, style, lines, block.lang, key))?.slice(0, shown) ?? lines.slice(0, shown).map((line, i) => codeLine(el, style, line, block.lang, `${key}.${i}`))
+        const session = style.consoleSplit && isSessionLang(block.lang)
+        const rows = session
+          ? lines.slice(0, shown).map((line, i) => sessionLine(el, style, line, `${key}.${i}`))
+          : (isShellLang(block.lang) ? null : highlightBlock(el, style, lines, block.lang, key))?.slice(0, shown) ?? lines.slice(0, shown).map((line, i) => codeLine(el, style, line, block.lang, `${key}.${i}`))
         const gutter = String(lines.length).length
+        const source = session ? sessionCommands(lines) : lines.join('\n')
+        const body = lines.length < NUMBER_AT || lines.length > NUMBER_MAX ? rows : rows.map((row, i) => row.type === 'Text' ? <Box key={`n${i}`} flexDirection="row"><Text color={t.codeComment} dimColor>{`${String(i + 1).padStart(gutter)}  `}</Text>{row}</Box> : row)
+        if (style.codeStyle === 'box') {
+          return (
+            <Box key={key} flexDirection="column">
+              {note ? <Text color={t.codeComment}>{note}</Text> : null}
+              <Box flexDirection="column" borderStyle="round" borderColor={t.rule} paddingX={1}>
+                <Box flexDirection="row" justifyContent="space-between" columnGap={4}>
+                  <Text color={t.codeComment}>{block.lang || 'code'}</Text>
+                  {copy?.(source, `copy${b}`) ?? null}
+                </Box>
+                {body}
+                {toggle?.element ?? null}
+              </Box>
+            </Box>
+          )
+        }
         return (
           <Box key={key} flexDirection="column" alignSelf="flex-start">
             {note ? <Text color={t.codeComment}>{note}</Text> : null}
             <Box flexDirection="row" justifyContent="space-between" columnGap={4}>
               <Text color={t.codeComment}>{`── ${block.lang || 'code'}`}</Text>
-              {copy?.(lines.join('\n'), `copy${b}`) ?? null}
+              {copy?.(source, `copy${b}`) ?? null}
             </Box>
             <Box flexDirection="column" paddingLeft={2}>
-              {lines.length < NUMBER_AT || lines.length > NUMBER_MAX ? rows : rows.map((row, i) => row.type === 'Text' ? <Box key={`n${i}`} flexDirection="row"><Text color={t.codeComment} dimColor>{`${String(i + 1).padStart(gutter)}  `}</Text>{row}</Box> : row)}
+              {body}
               {toggle?.element ?? null}
             </Box>
           </Box>
