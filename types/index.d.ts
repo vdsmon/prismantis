@@ -19,6 +19,7 @@ declare module 'claude-code' {
       unfolded: string[]
       sent: { text: string; at: number }[]
       turnEnds: { durationMs: number; at: number }[]
+      queued: string[]
       drawn: StateFamily<number>
       took: StateFamily<number>
     }

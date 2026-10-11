@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
+## [0.15.8] - 2026-10-11
+
+### Added
+
+- `dimQueued: true` draws a prompt you send while Claude is working in gray until Claude reads it.
+
 ## [0.15.7] - 2026-10-11
 
 ### Changed
