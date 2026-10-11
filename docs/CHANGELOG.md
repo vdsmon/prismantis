@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
+## [0.15.17] - 2026-10-11
+
+### Changed
+
+- A list's copy button sits to its right, like quotes and callouts, instead of on a line of its own above the list.
+
 ## [0.15.16] - 2026-10-11
 
 ### Changed

@@ -72,6 +72,13 @@ test('consoleSplit dims output lines and copies only the commands', { options: {
   await ui.unmount()
 })
 
+test('a list puts its copy button beside it, not on a line above', async $ => {
+  const ui = await $.ui.mount(reply('Steps:\n\n- Pull upstream\n- Run the checks'))
+  const rows = (await ui.findAll({ type: 'Box' })).filter(b => b.props.flexDirection === 'row' && b.props.columnGap === 2)
+  expect(rows.some(b => /Pull upstream/.test((b as { text?: string }).text ?? ''))).toBe(true)
+  await ui.unmount()
+})
+
 test('session commands fall back to every line when no line has a prompt', () => {
   expect(sessionCommands(['ls', 'pwd'])).toBe('ls\npwd')
   expect(sessionCommands(['$ ls', 'a.txt', '% pwd'])).toBe('ls\npwd')
