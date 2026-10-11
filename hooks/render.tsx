@@ -654,9 +654,11 @@ export const renderBlocks = (el: ElementTable, style: Style, blocks: Block[], co
     if (style.codeStyle === 'box' && block?.kind === 'code' && drawn.get(b)?.art !== undefined) {
       return (
         <Box key={`c${b}`} flexDirection="column" alignSelf="flex-start">
-          <el.Text color={style.theme.codeComment}>{` ${block.lang || 'diagram'}`}</el.Text>
+          <Box flexDirection="row" justifyContent="space-between" columnGap={2}>
+            <el.Text color={style.theme.codeComment}>{` ${block.lang || 'diagram'}`}</el.Text>
+            {button}
+          </Box>
           <Box flexDirection="column" borderStyle="round" borderColor={style.theme.rule} paddingX={1}>
-            <Box justifyContent="flex-end">{button}</Box>
             {element}
           </Box>
         </Box>

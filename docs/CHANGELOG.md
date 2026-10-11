@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
+## [0.15.19] - 2026-10-11
+
+### Changed
+
+- A boxed Mermaid diagram's `⧉ source` and `⧉ art` buttons sit outside the box, on the line with `mermaid`.
+
 ## [0.15.18] - 2026-10-11
 
 ### Changed
