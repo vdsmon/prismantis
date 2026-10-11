@@ -1,6 +1,6 @@
 {
   "name": "prismantis",
-  "version": "0.15.11",
+  "version": "0.15.12",
   "description": "Colorful, themeable rendering for Claude Code replies: tables, headings, code, numbers, paths and links.",
   "author": {
     "name": "Nahum Litvin",
@@ -281,6 +281,12 @@
       "type": "boolean",
       "title": "Tool rows",
       "description": "Draw tool calls as one compact line: Ran gh pr view 12, Read ~/src/app.ts, Edited README.md. Results still draw below as usual.",
+      "default": true
+    },
+    "diffCards": {
+      "type": "boolean",
+      "title": "Diff cards",
+      "description": "Draw Edit and Write results as the mod's diff card. Off leaves them to Claude Code's own diff, with its colors and word highlights.",
       "default": true
     },
     "diffSyntax": {
