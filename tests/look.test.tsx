@@ -72,6 +72,14 @@ test('consoleSplit dims output lines and copies only the commands', { options: {
   await ui.unmount()
 })
 
+test('codeStyle box puts a drawn diagram in a rounded box with its buttons inside', { options: { codeStyle: 'box' } }, async $ => {
+  const ui = await $.ui.mount(reply('Flow:\n\n```mermaid\nflowchart LR\n  A[Start] --> B[End]\n```'))
+  const boxes = (await ui.findAll({ type: 'Box' })).filter(b => b.props.borderStyle === 'round')
+  expect(boxes.some(b => /Start/.test((b as { text?: string }).text ?? '') && /source/.test((b as { text?: string }).text ?? ''))).toBe(true)
+  expect(await ui.find({ type: 'Text', text: /^ mermaid$/ })).toBeDefined()
+  await ui.unmount()
+})
+
 test('a list puts its copy button beside it, not on a line above', async $ => {
   const ui = await $.ui.mount(reply('Steps:\n\n- Pull upstream\n- Run the checks'))
   const rows = (await ui.findAll({ type: 'Box' })).filter(b => b.props.flexDirection === 'row' && b.props.columnGap === 2)

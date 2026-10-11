@@ -651,6 +651,17 @@ export const renderBlocks = (el: ElementTable, style: Style, blocks: Block[], co
     ) : first
     if (!button) return element
     const { Box } = el
+    if (style.codeStyle === 'box' && block?.kind === 'code' && drawn.get(b)?.art !== undefined) {
+      return (
+        <Box key={`c${b}`} flexDirection="column" alignSelf="flex-start">
+          <el.Text color={style.theme.codeComment}>{` ${block.lang || 'diagram'}`}</el.Text>
+          <Box flexDirection="column" borderStyle="round" borderColor={style.theme.rule} paddingX={1}>
+            <Box justifyContent="flex-end">{button}</Box>
+            {element}
+          </Box>
+        </Box>
+      )
+    }
     const rtl = style.reorder && block !== undefined && hasRtl(block.raw)
     return block?.kind === 'quote' || block?.kind === 'alert' || (block?.kind === 'list' && !rtl) ? (
       <Box key={`c${b}`} flexDirection="row" columnGap={2} {...(rtl ? { justifyContent: 'flex-end' as const } : {})}>

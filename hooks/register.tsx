@@ -257,7 +257,7 @@ const drawMarkdown = ($: EngineInterface, el: ReturnType<EngineInterface['ui']['
         const art = mermaidText(max === Infinity ? source : shortenEdgeLabels(source, max), style.mermaidAscii, columns)
         const wide = art === null ? Infinity : Math.max(...art.split('\n').map(width))
         narrowest = Math.min(narrowest, wide)
-        if (art === null || wide > columns - 2) continue
+        if (art === null || wide > columns - (style.codeStyle === 'box' ? 6 : 2)) continue
         drawn.set(i, { element: boxArt(el, style, art, `b${i}`), art })
         break
       }
