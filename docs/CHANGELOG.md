@@ -2,6 +2,13 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
+## [0.15.9] - 2026-10-11
+
+### Fixed
+
+- `turnLine: claude` puts the clock time on the same line, right after the duration (`✻ Brewed for 35s · 07:26`). It sat alone at the far right of the blank line above.
+- A turn line shows no time instead of a wrong one when its turn left no end record, as when a background agent is still running. It only takes an end time from the minute before it was drawn.
+
 ## [0.15.8] - 2026-10-11
 
 ### Added

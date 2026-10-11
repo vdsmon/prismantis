@@ -1,6 +1,6 @@
 {
   "name": "prismantis",
-  "version": "0.15.8",
+  "version": "0.15.9",
   "description": "Colorful, themeable rendering for Claude Code replies: tables, headings, code, numbers, paths and links.",
   "author": {
     "name": "Nahum Litvin",
@@ -98,7 +98,7 @@
     "turnLine": {
       "type": "string",
       "title": "Turn line",
-      "description": "The line that closes each turn (Baked for 1m 55s). themed: drawn in the theme's colors. claude: Claude Code's own line, with the clock time added when clock is on.",
+      "description": "The line that closes each turn (Baked for 1m 55s). themed: drawn in the theme's colors. claude: Claude Code's plain gray line, with the clock time at its end when clock is on.",
       "default": "themed",
       "options": ["themed", "claude"]
     },

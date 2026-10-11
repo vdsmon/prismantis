@@ -5,6 +5,7 @@ export type TurnEnd = { durationMs: number; at: number }
 
 const KEEP = 500
 const SLACK_MS = 2000
+const RECENT_MS = 60_000
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
 const two = (n: number) => String(n).padStart(2, '0')
@@ -30,7 +31,7 @@ export const sentAt = (sent: readonly Sent[], text: string, drawnAt: number): nu
 export const endedAt = (ends: readonly TurnEnd[], durationMs: number, drawnAt: number): number | undefined => {
   let best: TurnEnd | undefined
   for (const end of ends) {
-    if (end.at > drawnAt) continue
+    if (end.at > drawnAt || drawnAt - end.at > RECENT_MS) continue
     const gap = Math.abs(end.durationMs - durationMs)
     if (gap <= SLACK_MS && (best === undefined || gap <= Math.abs(best.durationMs - durationMs))) best = end
   }

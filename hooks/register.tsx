@@ -13,7 +13,7 @@ import type { ClipboardBackend } from './clipboard'
 import { clipboardCommand } from './clipboard'
 import { boxArt, mermaidText, shortenEdgeLabels, unsupportedKind } from './mermaid'
 import type { Drawn, Fold } from './render'
-import { isReadOnlyCall, remember, rememberCall, renderBlocks, renderDiffCard, renderExpandedShell, renderFailure, renderShellResult, renderToolGroup, renderToolRow, renderTurnDuration, renderUserPrompt, width } from './render'
+import { isReadOnlyCall, remember, rememberCall, renderBlocks, renderDiffCard, renderExpandedShell, renderFailure, renderPlainTurnDuration, renderShellResult, renderToolGroup, renderToolRow, renderTurnDuration, renderUserPrompt, width } from './render'
 import { helpText, rtlShowcaseText, showcaseText } from './help'
 import { PRESET_NAMES } from './presets'
 import type { Style } from './theme'
@@ -412,13 +412,7 @@ export const register: Register = (on, options) => {
     const time = at === undefined ? undefined : clockText(at, await $.clock.now(), style.clock)
     if (style.turnLine === 'themed') return renderTurnDuration($.ui.resolve(e), style, e.props.word, e.props.durationMs, time)
     if (time === undefined) return next(e)
-    const { Box, Text } = $.ui.resolve(e)
-    return (
-      <Box flexDirection="row">
-        {await next(e)}
-        <Text dimColor>{` · ${time}`}</Text>
-      </Box>
-    )
+    return renderPlainTurnDuration($.ui.resolve(e), e.props.word, e.props.durationMs, time)
   })
 
   if (style.dimQueued) {
