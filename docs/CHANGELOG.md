@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
+## [0.15.5] - 2026-10-11
+
+### Added
+
+- `treeMark: corner` draws a bold `┗` instead of `⎿` in front of tool rows, tool output and diff cards, so the mark sits in the middle of the line.
+
 ## [0.15.4] - 2026-10-11
 
 ### Added
