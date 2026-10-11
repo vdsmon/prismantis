@@ -1,6 +1,6 @@
 {
   "name": "prismantis",
-  "version": "0.15.15",
+  "version": "0.15.16",
   "description": "Colorful, themeable rendering for Claude Code replies: tables, headings, code, numbers, paths and links.",
   "author": {
     "name": "Nahum Litvin",
@@ -286,7 +286,7 @@
     "codeStyle": {
       "type": "string",
       "title": "Code block style",
-      "description": "How fenced code blocks in replies draw. rule: a ── lang line over indented code. box: a rounded border around the whole block, the language and copy button on its first line, like Slack.",
+      "description": "How fenced code blocks in replies draw. rule: a ── lang line over indented code. box: a rounded border around the code, like Slack, with the copy button inside at the top right and the language just above.",
       "default": "rule",
       "options": ["rule", "box"]
     },
