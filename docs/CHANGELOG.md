@@ -2,6 +2,13 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
+## [0.15.15] - 2026-10-11
+
+### Added
+
+- `codeStyle: box` draws fenced code blocks inside a rounded border, the language and copy button on its first line.
+- `consoleSplit: true` tells commands from output in `console` and `shell-session` blocks: `$` and `%` lines are colored as commands, the rest is plain dimmed output, and the copy button copies the commands only.
+
 ## [0.15.14] - 2026-10-11
 
 ### Added

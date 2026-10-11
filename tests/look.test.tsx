@@ -4,7 +4,7 @@ import { expect, mock, test } from 'claude-code/testing'
 import { PRESETS } from '../hooks/presets'
 import { endedAt } from '../hooks/clock'
 import { withoutDelivered, withQueued } from '../hooks/queue'
-import { changedRanges, diffLang, tint } from '../hooks/render'
+import { changedRanges, diffLang, sessionCommands, tint } from '../hooks/render'
 
 const t = PRESETS['catppuccin-mocha']
 const engine = (on: On) =>
@@ -43,6 +43,37 @@ test('replies keep no gap by default', async $ => {
   const ui = await $.ui.mount(reply('One sentence.'))
   expect(await marginOf(ui)).toBeUndefined()
   await ui.unmount()
+})
+
+const SESSION = 'Run:\n\n```console\n$ git status --short\n## main...origin/main\n$ mise run test\nok - cc-keepwarm\n```'
+
+test('codeStyle box draws code blocks inside a rounded border with the language and copy button', { options: { codeStyle: 'box' } }, async $ => {
+  const ui = await $.ui.mount(reply('Run:\n\n```python\nprint("hi")\n```'))
+  const box = (await ui.findAll({ type: 'Box' })).find(b => b.props.borderStyle === 'round')
+  expect(box?.props.borderColor).toBe(t.rule)
+  expect(await ui.find({ type: 'Text', text: /^python$/ })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /^── python$/ })).toBeUndefined()
+  await ui.unmount()
+})
+
+test('consoleSplit dims output lines and copies only the commands', { options: { consoleSplit: true } }, async ($, on) => {
+  const copied: string[] = []
+  on('ui.copy', (_, e) => {
+    copied.push(e.text)
+    return { value: { isCopied: true as const } }
+  })
+  const ui = await $.ui.mount(reply(SESSION))
+  expect((await ui.find({ type: 'Text', text: /^ok - cc-keepwarm$/ }))?.props.dimColor).toBe(true)
+  expect((await ui.find({ type: 'Text', text: /^\$ $/ }))?.props.color).toBe(t.accent)
+  const button = (await ui.findAll({ type: 'Button' })).find(b => b.props.label !== '⧉ copy reply')
+  await ui.press({ key: String(button?.key ?? '') })
+  expect(copied).toEqual(['git status --short\nmise run test'])
+  await ui.unmount()
+})
+
+test('session commands fall back to every line when no line has a prompt', () => {
+  expect(sessionCommands(['ls', 'pwd'])).toBe('ls\npwd')
+  expect(sessionCommands(['$ ls', 'a.txt', '% pwd'])).toBe('ls\npwd')
 })
 
 const prompt = () => ({ plugin: 'prismantis', surface: 'terminal' as const, component: 'UserMessage' as const, props: { text: 'how many frog raids?', origin: { kind: 'composer' } as never, isExpanded: true }, viewport: { columns: 80, rows: 10 } })

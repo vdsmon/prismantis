@@ -1,6 +1,6 @@
 {
   "name": "prismantis",
-  "version": "0.15.14",
+  "version": "0.15.15",
   "description": "Colorful, themeable rendering for Claude Code replies: tables, headings, code, numbers, paths and links.",
   "author": {
     "name": "Nahum Litvin",
@@ -282,6 +282,19 @@
       "title": "Tool rows",
       "description": "Draw tool calls as one compact line: Ran gh pr view 12, Read ~/src/app.ts, Edited README.md. Results still draw below as usual.",
       "default": true
+    },
+    "codeStyle": {
+      "type": "string",
+      "title": "Code block style",
+      "description": "How fenced code blocks in replies draw. rule: a ── lang line over indented code. box: a rounded border around the whole block, the language and copy button on its first line, like Slack.",
+      "default": "rule",
+      "options": ["rule", "box"]
+    },
+    "consoleSplit": {
+      "type": "boolean",
+      "title": "Split console commands from output",
+      "description": "In console and shell-session blocks, color the lines that start with $ or % as commands and draw the other lines as plain dimmed output. The copy button copies only the commands.",
+      "default": false
     },
     "diffCards": {
       "type": "boolean",

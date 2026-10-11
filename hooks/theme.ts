@@ -31,6 +31,8 @@ export type Style = {
   turnClock: boolean
   diffCards: boolean
   diffBox: boolean
+  codeStyle: 'rule' | 'box'
+  consoleSplit: boolean
   clock: Clock
   toolStyle: 'chat' | 'tree-dim' | 'tree-bold' | 'classic'
   toolOutput: 'full' | 'quiet'
@@ -89,6 +91,8 @@ export const resolveStyle = (options: PluginOptions): Style => {
     turnClock: options.turnClock !== false,
     diffCards: options.diffCards !== false,
     diffBox: options.diffBox === true,
+    codeStyle: pick(options.codeStyle, ['rule', 'box'] as const, 'rule'),
+    consoleSplit: options.consoleSplit === true,
     clock: pick(options.clock, ['off', '24h', '12h'] as const, 'off'),
     toolStyle: pick(options.toolStyle, ['chat', 'tree-dim', 'tree-bold', 'classic'] as const, 'chat'),
     toolOutput: pick(options.toolOutput, ['full', 'quiet'] as const, 'full'),
