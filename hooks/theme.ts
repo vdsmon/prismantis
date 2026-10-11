@@ -23,7 +23,7 @@ export type Style = {
   promptAlign: 'left' | 'right'
   turnLine: 'themed' | 'claude'
   copyReply: boolean
-  diffTint: 'soft' | 'vivid'
+  diffTint: 'soft' | 'vivid' | 'claude'
   treeMark: 'hook' | 'corner'
   replyGap: boolean
   dimQueued: boolean
@@ -81,7 +81,7 @@ export const resolveStyle = (options: PluginOptions): Style => {
     promptAlign: pick(options.promptAlign, ['left', 'right'] as const, 'left'),
     turnLine: pick(options.turnLine, ['themed', 'claude'] as const, 'themed'),
     copyReply: options.copyReply !== false,
-    diffTint: pick(options.diffTint, ['soft', 'vivid'] as const, 'soft'),
+    diffTint: pick(options.diffTint, ['soft', 'vivid', 'claude'] as const, 'soft'),
     treeMark: pick(options.treeMark, ['hook', 'corner'] as const, 'hook'),
     replyGap: options.replyGap === true,
     dimQueued: options.dimQueued === true,

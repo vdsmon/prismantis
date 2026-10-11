@@ -4,7 +4,7 @@ import { expect, mock, test } from 'claude-code/testing'
 import { PRESETS } from '../hooks/presets'
 import { endedAt } from '../hooks/clock'
 import { withoutDelivered, withQueued } from '../hooks/queue'
-import { diffLang, tint } from '../hooks/render'
+import { changedRanges, diffLang, tint } from '../hooks/render'
 
 const t = PRESETS['catppuccin-mocha']
 const engine = (on: On) =>
@@ -179,6 +179,25 @@ test('diffCards off leaves edits to the engine', { options: { diffCards: false }
   const ui = await $.ui.mount(edit)
   expect(await ui.find({ type: 'Text', text: /^engine$/ })).toBeDefined()
   await ui.unmount()
+})
+
+test('diffTint claude uses Claude Code diff colors and highlights the changed words', { options: { diffTint: 'claude', diffSyntax: true } }, async ($, on) => {
+  engine(on)
+  const js = { filePath: '/tmp/app.js', structuredPatch: [{ oldStart: 1, newStart: 1, lines: [' function greet() {', '-  log("Hello, World!");', '+  log("Hello, Claude!");', ' }'] }] }
+  const ui = await $.ui.mount({ ...edit, props: { ...edit.props, output: js } })
+  expect((await ui.find({ type: 'Box', text: /^2 \+ {3}log\("Hello, Claude!"\);$/ }))?.props.backgroundColor).toBe('#022800')
+  expect((await ui.find({ type: 'Box', text: /^2 - {3}log\("Hello, World!"\);$/ }))?.props.backgroundColor).toBe('#3d0101')
+  expect((await ui.find({ type: 'Text', text: /^Claude$/ }))?.props.backgroundColor).toBe('#044700')
+  expect((await ui.find({ type: 'Text', text: /^World$/ }))?.props.backgroundColor).toBe('#5c0100')
+  expect((await ui.find({ type: 'Text', text: /^function$/ }))?.props.dimColor).toBeUndefined()
+  await ui.unmount()
+})
+
+test('changed ranges pair removed and added lines and skip lines with nothing in common', () => {
+  const row = (mark: '+' | '-' | ' ', text: string) => ({ mark, num: 1, text })
+  expect(changedRanges([row('-', 'a = 1'), row('+', 'a = 2'), row(' ', 'b')])).toEqual([[4, 5], [4, 5], undefined])
+  expect(changedRanges([row('-', 'abc'), row('+', 'xyz')])).toEqual([undefined, undefined])
+  expect(changedRanges([row('+', 'new')])).toEqual([undefined])
 })
 
 test('diffBox draws a rounded box around the engine diff', { options: { diffCards: false, diffBox: true } }, async ($, on) => {
