@@ -287,6 +287,7 @@ Options sit under `options`, keyed by the plugin's install name. Project setting
 | `highlightPaths` | `true`, `false` | `true` |
 | `toolRows` | `true`, `false` | `true` |
 | `toolStyle` | `chat`, `tree-dim`, `tree-bold`, `classic` | `chat` |
+| `replyGap` | `true`, `false` | `false` |
 | `treeMark` | `hook` (`⎿`), `corner` (`┗`, bold) | `hook` |
 | `toolOutput` | `full`, `quiet` | `full` |
 | `diffTint` | `soft`, `vivid` | `soft` |

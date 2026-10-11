@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
+## [0.15.6] - 2026-10-11
+
+### Added
+
+- `replyGap: true` puts a blank line before each part of Claude's reply, so a sentence and the tool rows under it read as one block.
+
 ## [0.15.5] - 2026-10-11
 
 ### Added

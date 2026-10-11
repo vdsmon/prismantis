@@ -471,7 +471,7 @@ export const register: Register = (on, options) => {
     const surfaceStyle = forSurface(fit(e.viewport), e.surface)
     const open = await read($, unfolded)
     return (
-      <Box flexDirection="row">
+      <Box flexDirection="row" {...(style.replyGap ? { marginTop: 1 } : {})}>
         <Box width={2} flexShrink={0}>
           <Text color={style.theme.accent}>{e.props.isFirstOfReply ? '●' : ' '}</Text>
         </Box>
