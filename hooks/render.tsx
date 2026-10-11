@@ -163,13 +163,13 @@ const grammarFor = (lang: string) => {
   return grammar !== null && typeof grammar === 'object' ? grammar : undefined
 }
 
-export const highlightBlock = ({ Text }: ElementTable, style: Style, lines: string[], lang: string, key: string): RenderElement[] | null => {
+const highlightRows = (style: Style, lines: string[], lang: string): Segment[][] | null => {
   const grammar = grammarFor(lang)
   if (!grammar) return null
   const code = lines.join('\n')
   const cache = highlighted.get(style.theme) ?? new Map<string, Segment[][]>()
   highlighted.set(style.theme, cache)
-  const rows = remember(cache, `${style.reorder ? style.shape : ''}\0${lang}\0${code}`, () => {
+  return remember(cache, `${style.reorder ? style.shape : ''}\0${lang}\0${code}`, () => {
     const out: Segment[][] = [[]]
     for (const seg of flatten(tokenize(code, grammar), style)) {
       seg.text.split('\n').forEach((piece, i) => {
@@ -179,6 +179,11 @@ export const highlightBlock = ({ Text }: ElementTable, style: Style, lines: stri
     }
     return out
   })
+}
+
+export const highlightBlock = ({ Text }: ElementTable, style: Style, lines: string[], lang: string, key: string): RenderElement[] | null => {
+  const rows = highlightRows(style, lines, lang)
+  if (!rows) return null
   return rows.map((row, r) => (
     <Text key={`${key}.${r}`} color={style.theme.codeText}>
       {row.length ? row.map((s, i) => <Text key={`${key}.${r}.${i}`} color={s.color} italic={s.italic}>{s.text}</Text>) : ' '}
@@ -809,6 +814,81 @@ export const renderBoxed = ({ Box, Text }: ElementTable, style: Style, inner: Re
   </Box>
 )
 
+const CLAUDE_DIFF = {
+  dark: { addBg: '#022800', delBg: '#3d0101', addWord: '#044700', delWord: '#5c0100', addMark: '#41aa41', delMark: '#be4949', number: '#a3a39f' },
+  light: { addBg: '#d6f5d6', delBg: '#fbd5d5', addWord: '#a6e9a6', delWord: '#f5a3a3', addMark: '#2f8a2f', delMark: '#b33b3b', number: '#6b6b6b' },
+}
+
+export const changedRanges = (rows: readonly DiffLine[]): ([number, number] | undefined)[] => {
+  const ranges: ([number, number] | undefined)[] = rows.map(() => undefined)
+  let i = 0
+  while (i < rows.length) {
+    if (rows[i]!.mark !== '-') {
+      i++
+      continue
+    }
+    const dels: number[] = []
+    while (i < rows.length && rows[i]!.mark === '-') dels.push(i++)
+    const adds: number[] = []
+    while (i < rows.length && rows[i]!.mark === '+') adds.push(i++)
+    for (let k = 0; k < Math.min(dels.length, adds.length); k++) {
+      const a = rows[dels[k]!]!.text
+      const b = rows[adds[k]!]!.text
+      let head = 0
+      while (head < a.length && head < b.length && a[head] === b[head]) head++
+      let tail = 0
+      while (tail < a.length - head && tail < b.length - head && a[a.length - 1 - tail] === b[b.length - 1 - tail]) tail++
+      if (head === 0 && tail === 0) continue
+      if (a.length - tail > head) ranges[dels[k]!] = [head, a.length - tail]
+      if (b.length - tail > head) ranges[adds[k]!] = [head, b.length - tail]
+    }
+  }
+  return ranges
+}
+
+const markRange = (segs: readonly Segment[], range: [number, number] | undefined): (Segment & { hit: boolean })[] => {
+  const out: (Segment & { hit: boolean })[] = []
+  let at = 0
+  for (const seg of segs) {
+    const start = at
+    at += seg.text.length
+    if (!range || at <= range[0] || start >= range[1]) {
+      out.push({ ...seg, hit: false })
+      continue
+    }
+    const cuts = [start, Math.max(start, range[0]), Math.min(at, range[1]), at]
+    for (let c = 0; c < 3; c++) {
+      const piece = seg.text.slice(cuts[c]! - start, cuts[c + 1]! - start)
+      if (piece) out.push({ ...seg, text: piece, hit: c === 1 })
+    }
+  }
+  return out
+}
+
+const renderClaudeDiff = (el: ElementTable, style: Style, output: unknown, rows: DiffLine[], shown: DiffLine[], gutter: number): RenderElement[] => {
+  const { Box, Text } = el
+  const t = style.theme
+  const c = isDark(t.codeText) ? CLAUDE_DIFF.dark : CLAUDE_DIFF.light
+  const lang = style.diffSyntax ? diffLang((output as { filePath?: unknown } | null)?.filePath) : undefined
+  const painted = lang === undefined || isShellLang(lang) ? null : highlightRows(style, shown.map(r => r.text), lang)
+  const ranges = changedRanges(rows).slice(0, shown.length)
+  return shown.map((r, i) => {
+    const bg = r.mark === '+' ? c.addBg : r.mark === '-' ? c.delBg : undefined
+    const word = r.mark === '+' ? c.addWord : c.delWord
+    const mark = r.mark === '+' ? c.addMark : r.mark === '-' ? c.delMark : c.number
+    const segs = markRange(painted?.[i] ?? [{ text: r.text, color: t.codeText, italic: false }], ranges[i])
+    return (
+      <Box key={`d${i}`} flexDirection="row" {...(bg ? { backgroundColor: bg } : {})}>
+        <Text color={mark}>{`${String(r.num).padStart(gutter)} `}</Text>
+        <Text color={mark}>{`${r.mark === ' ' ? ' ' : r.mark} `}</Text>
+        <Text color={t.codeText}>
+          {segs.length === 0 ? ' ' : segs.map((s, k) => <Text key={`d${i}.${k}`} color={s.color ?? t.codeText} italic={s.italic} {...(s.hit ? { backgroundColor: word } : {})}>{s.text}</Text>)}
+        </Text>
+      </Box>
+    )
+  })
+}
+
 export const renderDiffCard = (el: ElementTable, style: Style, output: unknown, fold: Fold, id: string): RenderElement | undefined => {
   const rows = diffLines(output)
   if (rows === undefined) return undefined
@@ -831,7 +911,7 @@ export const renderDiffCard = (el: ElementTable, style: Style, output: unknown, 
           <Text> </Text>
           <Text color={t.codeFlag} dimColor={removed === 0}>{`−${removed}`}</Text>
         </Text>
-        {shown.map((r, i) => {
+        {style.diffTint === 'claude' ? renderClaudeDiff(el, style, output, rows, shown, gutter) : shown.map((r, i) => {
           const bg = tints[r.mark]
           return (
             <Box key={`d${i}`} flexDirection="row" {...(bg ? { backgroundColor: bg } : {})}>

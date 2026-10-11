@@ -295,7 +295,7 @@ Options sit under `options`, keyed by the plugin's install name. Project setting
 | `diffCards` | `true`, `false` | `true` |
 | `diffBox` | `true`, `false` | `false` |
 | `diffSyntax` | `true`, `false` | `false` |
-| `diffTint` | `soft`, `vivid` | `soft` |
+| `diffTint` | `soft`, `vivid`, `claude` | `soft` |
 | `copyButtons` | `true`, `false` | `true` |
 | `copyReply` | `true`, `false` | `true` |
 | `diagramHints` | `true`, `false` | `true` |

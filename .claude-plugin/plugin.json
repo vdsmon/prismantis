@@ -1,6 +1,6 @@
 {
   "name": "prismantis",
-  "version": "0.15.13",
+  "version": "0.15.14",
   "description": "Colorful, themeable rendering for Claude Code replies: tables, headings, code, numbers, paths and links.",
   "author": {
     "name": "Nahum Litvin",
@@ -304,9 +304,9 @@
     "diffTint": {
       "type": "string",
       "title": "Diff card tint",
-      "description": "The background of added and removed lines in edit diff cards. soft: a faint tint over the theme's rule color. vivid: a stronger green and red tint, like GitHub's diff view.",
+      "description": "The background of added and removed lines in edit diff cards. soft: a faint tint over the theme's rule color. vivid: a stronger green and red tint, like GitHub's diff view. claude: Claude Code's own diff colors, with changed words highlighted and line numbers in the row's color.",
       "default": "soft",
-      "options": ["soft", "vivid"]
+      "options": ["soft", "vivid", "claude"]
     },
     "emphasisColor": {
       "type": "string",

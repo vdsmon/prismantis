@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
+## [0.15.14] - 2026-10-11
+
+### Added
+
+- `diffTint: claude` draws the diff card in Claude Code's own diff colors: deep green and red rows, the changed words of a replaced line highlighted, line numbers and marks in the row's color, and unchanged lines at full brightness.
+
 ## [0.15.13] - 2026-10-11
 
 ### Added
