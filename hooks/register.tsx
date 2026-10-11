@@ -348,6 +348,7 @@ export const register: Register = (on, options) => {
     })
     on('ui.render', { component: 'ToolResult' }, async ($, e, next) => {
       if ((e.props.tool === 'Edit' || e.props.tool === 'Write') && !e.props.isErrored) {
+        if (!style.diffCards) return next(e)
         const el = $.ui.resolve(e)
         return renderDiffCard(el, fit(e.viewport), e.props.output, folder($, el, await read($, unfolded)), e.props.tool_use_id) ?? next(e)
       }

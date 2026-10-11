@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
+## [0.15.12] - 2026-10-11
+
+### Added
+
+- `diffCards: false` leaves Edit and Write results to Claude Code's own diff and keeps the other tool rows.
+
 ## [0.15.11] - 2026-10-11
 
 ### Added

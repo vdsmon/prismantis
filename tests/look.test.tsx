@@ -174,6 +174,13 @@ test('treeMark keeps the hook mark by default', { options: { toolStyle: 'tree-bo
   await tool.unmount()
 })
 
+test('diffCards off leaves edits to the engine', { options: { diffCards: false } }, async ($, on) => {
+  engine(on)
+  const ui = await $.ui.mount(edit)
+  expect(await ui.find({ type: 'Text', text: /^engine$/ })).toBeDefined()
+  await ui.unmount()
+})
+
 test('diffSyntax colors diff card code by the file language', { options: { diffSyntax: true } }, async ($, on) => {
   engine(on)
   const py = { filePath: '/tmp/app.py', structuredPatch: [{ oldStart: 1, newStart: 1, lines: ['+def greet(name):', '+    return "hi"'] }] }
