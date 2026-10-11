@@ -224,6 +224,10 @@ Task lists draw as `[ ]` and `[✓]`, with done items dimmed and struck through.
 
 ![A task list with done items struck through](docs/task-lists.png)
 
+### Tables in tool output
+
+Shell and MCP output that is a JSON array of objects, or CSV or TSV under a header line, draws as a table in the theme, with its copy buttons, and a line under it with the row count and how long the call ran: `4 rows · 1s`. A result row of its own shows the whole table up to 20 rows; longer output keeps Claude Code's own drawing, since a mod cannot tell when ctrl+o expands that row. A folded group (`Ran 1 shell command`) shows the first 20 rows under its summary, `20 of 143 rows · ctrl+o shows all`, and ctrl+o unfolds the raw output. `toolRows: false` turns tables off with the other tool rows, and `toolOutput: quiet` keeps a folded group to its summary.
+
 ### Your prompts
 
 ![Your prompts: plain Claude Code on the left, prismantis on the right](docs/compare/prompts.png)

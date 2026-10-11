@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Added
+
+- Shell and MCP output that is a JSON array of objects, or CSV or TSV under a header line, draws as a themed table with copy buttons and a `4 rows · 1s` line. A result row shows the whole table up to 20 rows; a folded group shows the first 20 under its summary and says how many there are. Off with `toolRows: false`; `toolOutput: quiet` keeps folded groups to their summary.
+
 ## [0.15.2] - 2026-10-11
 
 ### Added
