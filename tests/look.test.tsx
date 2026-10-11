@@ -181,6 +181,14 @@ test('diffCards off leaves edits to the engine', { options: { diffCards: false }
   await ui.unmount()
 })
 
+test('diffBox draws a rounded box around the engine diff', { options: { diffCards: false, diffBox: true } }, async ($, on) => {
+  engine(on)
+  const ui = await $.ui.mount(edit)
+  expect(await ui.find({ type: 'Text', text: /^engine$/ })).toBeDefined()
+  expect((await ui.findAll({ type: 'Box' })).some(b => b.props.borderStyle === 'round')).toBe(true)
+  await ui.unmount()
+})
+
 test('diffSyntax colors diff card code by the file language', { options: { diffSyntax: true } }, async ($, on) => {
   engine(on)
   const py = { filePath: '/tmp/app.py', structuredPatch: [{ oldStart: 1, newStart: 1, lines: ['+def greet(name):', '+    return "hi"'] }] }

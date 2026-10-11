@@ -293,6 +293,7 @@ Options sit under `options`, keyed by the plugin's install name. Project setting
 | `treeMark` | `hook` (`⎿`), `corner` (`└─`, bold) | `hook` |
 | `toolOutput` | `full`, `quiet` | `full` |
 | `diffCards` | `true`, `false` | `true` |
+| `diffBox` | `true`, `false` | `false` |
 | `diffSyntax` | `true`, `false` | `false` |
 | `diffTint` | `soft`, `vivid` | `soft` |
 | `copyButtons` | `true`, `false` | `true` |

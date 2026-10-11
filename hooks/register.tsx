@@ -13,7 +13,7 @@ import type { ClipboardBackend } from './clipboard'
 import { clipboardCommand } from './clipboard'
 import { boxArt, mermaidText, shortenEdgeLabels, unsupportedKind } from './mermaid'
 import type { Drawn, Fold } from './render'
-import { isReadOnlyCall, remember, rememberCall, renderBlocks, renderDiffCard, renderExpandedShell, renderFailure, renderPlainTurnDuration, renderShellResult, renderToolGroup, renderToolRow, renderTurnDuration, renderUserPrompt, width } from './render'
+import { isReadOnlyCall, remember, rememberCall, renderBlocks, renderDiffCard, renderExpandedShell, renderBoxed, renderFailure, renderPlainTurnDuration, renderShellResult, renderToolGroup, renderToolRow, renderTurnDuration, renderUserPrompt, width } from './render'
 import { helpText, rtlShowcaseText, showcaseText } from './help'
 import { PRESET_NAMES } from './presets'
 import type { Style } from './theme'
@@ -348,7 +348,7 @@ export const register: Register = (on, options) => {
     })
     on('ui.render', { component: 'ToolResult' }, async ($, e, next) => {
       if ((e.props.tool === 'Edit' || e.props.tool === 'Write') && !e.props.isErrored) {
-        if (!style.diffCards) return next(e)
+        if (!style.diffCards) return style.diffBox ? renderBoxed($.ui.resolve(e), fit(e.viewport), await next(e)) : next(e)
         const el = $.ui.resolve(e)
         return renderDiffCard(el, fit(e.viewport), e.props.output, folder($, el, await read($, unfolded)), e.props.tool_use_id) ?? next(e)
       }

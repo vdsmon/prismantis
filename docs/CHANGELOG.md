@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
+## [0.15.13] - 2026-10-11
+
+### Added
+
+- `diffBox: true`, with `diffCards: false`, draws a rounded box around Claude Code's own diff and changes nothing inside it.
+
 ## [0.15.12] - 2026-10-11
 
 ### Added
