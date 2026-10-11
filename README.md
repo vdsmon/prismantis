@@ -279,14 +279,18 @@ Options sit under `options`, keyed by the plugin's install name. Project setting
 | `tableStyle` | `box`, `rules`, `grid`, `minimal` | `box` |
 | `taskStyle` | `checks` (`[ ]` `[✓]`, done struck through), `ticks` (`○` `✓`), `box` (`□` `✓`), `progress` (ticks with a done-count bar) | `checks` |
 | `promptStyle` | `bubble`, `bar`, `chevron`, `off` | `bubble` |
+| `promptAlign` | `left`, `right` | `left` |
 | `clock` | `off`, `24h`, `12h` | `off` |
+| `turnLine` | `themed`, `claude` | `themed` |
 | `headingStyle` | `banner`, `bold`, `underline`, `uppercase` | `banner` |
 | `highlightNumbers` | `true`, `false` | `true` |
 | `highlightPaths` | `true`, `false` | `true` |
 | `toolRows` | `true`, `false` | `true` |
 | `toolStyle` | `chat`, `tree-dim`, `tree-bold`, `classic` | `chat` |
 | `toolOutput` | `full`, `quiet` | `full` |
+| `diffTint` | `soft`, `vivid` | `soft` |
 | `copyButtons` | `true`, `false` | `true` |
+| `copyReply` | `true`, `false` | `true` |
 | `diagramHints` | `true`, `false` | `true` |
 | `rtl` | `auto`, a terminal (`warp`, `kitty`, `apple-terminal`, `iterm`, `ghostty`, `wezterm`, `vscode`, `alacritty`, `windows-terminal`, `gnome`, `konsole`), `off` | `auto` |
 | `mermaid` | `true`, `false` | `true` |

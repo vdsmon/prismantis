@@ -739,6 +739,19 @@ export const tint = (base: string | undefined, color: string | undefined, share 
   return `#${[1, 3, 5].map(i => Math.round(channel(base, i) * (1 - share) + channel(color, i) * share).toString(16).padStart(2, '0')).join('')}`
 }
 
+const isDark = (hex: string | undefined): boolean => {
+  if (!hex || !HEX.test(hex)) return true
+  const [r, g, b] = [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16))
+  return 0.299 * r! + 0.587 * g! + 0.114 * b! > 128
+}
+
+export const diffTints = (style: Style): Record<'+' | '-', string | undefined> => {
+  const t = style.theme
+  if (style.diffTint === 'soft') return { '+': tint(t.rule, t.number), '-': tint(t.rule, t.codeFlag) }
+  const base = isDark(t.codeText) ? '#000000' : '#ffffff'
+  return { '+': tint(base, t.number, 0.3), '-': tint(base, t.codeFlag, 0.3) }
+}
+
 export const diffLines = (output: unknown): DiffLine[] | undefined => {
   if (output === null || typeof output !== 'object') return undefined
   const out = output as { type?: unknown; content?: unknown; structuredPatch?: unknown }
@@ -774,7 +787,7 @@ export const renderDiffCard = (el: ElementTable, style: Style, output: unknown, 
   const shown = rows.slice(0, toggle?.folded === false ? DIFF_MAX : DIFF_LINES)
   const gutter = String(Math.max(0, ...shown.map(r => r.num))).length
   const color = (mark: DiffLine['mark']) => (mark === '+' ? t.number : mark === '-' ? t.codeFlag : undefined)
-  const tints = { '+': tint(t.rule, t.number), '-': tint(t.rule, t.codeFlag), ' ': undefined }
+  const tints = { ...diffTints(style), ' ': undefined }
   return (
     <Box flexDirection="row">
       <Text dimColor>{'  ⎿  '}</Text>
@@ -1271,9 +1284,10 @@ export const renderUserPrompt = (el: ElementTable, style: Style, text: string, c
   )
   const stamp = time === undefined ? null : <Text color={t.codeComment}>{rtl ? ` ${time}` : `${time} `}</Text>
   const content = stamp === null ? body : <Box flexDirection="row">{rtl ? body : stamp}{rtl ? stamp : body}</Box>
+  const right = rtl || style.promptAlign === 'right'
   if (style.promptStyle === 'bubble') {
-    return <Box borderStyle="round" borderColor={t.accent} paddingX={1} alignSelf={rtl ? 'flex-end' : 'flex-start'}>{content}</Box>
+    return <Box borderStyle="round" borderColor={t.accent} paddingX={1} alignSelf={right ? 'flex-end' : 'flex-start'}>{content}</Box>
   }
   const mark = <Text color={t.accent} bold>{style.promptStyle === 'bar' ? (rtl ? ' ▐' : '▌ ') : rtl ? ' ‹' : '› '}</Text>
-  return <Box flexDirection="row" {...(rtl ? { justifyContent: 'flex-end' as const } : {})}>{rtl ? content : mark}{rtl ? mark : content}</Box>
+  return <Box flexDirection="row" {...(right ? { justifyContent: 'flex-end' as const } : {})}>{rtl ? content : mark}{rtl ? mark : content}</Box>
 }

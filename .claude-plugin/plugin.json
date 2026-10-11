@@ -1,6 +1,6 @@
 {
   "name": "prismantis",
-  "version": "0.15.3",
+  "version": "0.15.4",
   "description": "Colorful, themeable rendering for Claude Code replies: tables, headings, code, numbers, paths and links.",
   "author": {
     "name": "Nahum Litvin",
@@ -81,12 +81,26 @@
       "default": "bubble",
       "options": ["bubble", "bar", "chevron", "off"]
     },
+    "promptAlign": {
+      "type": "string",
+      "title": "Your prompt side",
+      "description": "Which side of the transcript the prompts you type sit on. left: where Claude Code puts them. right: like a chat, with Claude's replies on the left. Needs a promptStyle other than off.",
+      "default": "left",
+      "options": ["left", "right"]
+    },
     "clock": {
       "type": "string",
       "title": "Clock times",
       "description": "Shows when you sent each prompt and when each turn finished. 24h: 14:32. 12h: 2:32 PM. A time from another day gets its date. off: no times.",
       "default": "off",
       "options": ["off", "24h", "12h"]
+    },
+    "turnLine": {
+      "type": "string",
+      "title": "Turn line",
+      "description": "The line that closes each turn (Baked for 1m 55s). themed: drawn in the theme's colors. claude: Claude Code's own line, with the clock time added when clock is on.",
+      "default": "themed",
+      "options": ["themed", "claude"]
     },
     "toolStyle": {
       "type": "string",
@@ -244,6 +258,13 @@
       "description": "Draw tool calls as one compact line: Ran gh pr view 12, Read ~/src/app.ts, Edited README.md. Results still draw below as usual.",
       "default": true
     },
+    "diffTint": {
+      "type": "string",
+      "title": "Diff card tint",
+      "description": "The background of added and removed lines in edit diff cards. soft: a faint tint over the theme's rule color. vivid: a stronger green and red tint, like GitHub's diff view.",
+      "default": "soft",
+      "options": ["soft", "vivid"]
+    },
     "emphasisColor": {
       "type": "string",
       "title": "Italic text",
@@ -284,6 +305,12 @@
       "type": "boolean",
       "title": "Copy buttons",
       "description": "Put a copy button on code blocks, tables, diagrams, lists and quotes. Reach them with ctrl+x tab then Enter, or click where the terminal passes clicks through.",
+      "default": true
+    },
+    "copyReply": {
+      "type": "boolean",
+      "title": "Copy reply button",
+      "description": "Put a copy reply button under replies of more than one block. Off keeps the other copy buttons.",
       "default": true
     },
     "diagramHints": {
