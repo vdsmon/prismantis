@@ -84,6 +84,26 @@ test('diffTint vivid tints changed lines over black on a dark theme', { options:
   await ui.unmount()
 })
 
+const row = { plugin: 'prismantis', surface: 'terminal' as const, component: 'ToolUse' as const, props: { tool_use_id: 'r1', tool: 'Read', input: { file_path: '/tmp/app.ts' }, isRunning: false, isErrored: false, isInterrupted: false } }
+
+test('treeMark corner draws a bold heavy corner in front of tool rows and diff cards', { options: { toolStyle: 'tree-bold', treeMark: 'corner' } }, async ($, on) => {
+  engine(on)
+  const tool = await $.ui.mount(row)
+  expect((await tool.find({ type: 'Text', text: /^ {2}┗ $/ }))?.props.bold).toBe(true)
+  expect(await tool.find({ type: 'Text', text: /⎿/ })).toBeUndefined()
+  await tool.unmount()
+  const card = await $.ui.mount(edit)
+  expect((await card.find({ type: 'Text', text: /^ {2}┗ {2}$/ }))?.props.bold).toBe(true)
+  await card.unmount()
+})
+
+test('treeMark keeps the hook mark by default', { options: { toolStyle: 'tree-bold' } }, async ($, on) => {
+  engine(on)
+  const tool = await $.ui.mount(row)
+  expect(await tool.find({ type: 'Text', text: /^ {2}⎿ $/ })).toBeDefined()
+  await tool.unmount()
+})
+
 test('diffTint vivid tints over white on a light theme', { options: { diffTint: 'vivid', theme: 'catppuccin-latte' } }, async ($, on) => {
   engine(on)
   const ui = await $.ui.mount(edit)

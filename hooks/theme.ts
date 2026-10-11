@@ -24,6 +24,7 @@ export type Style = {
   turnLine: 'themed' | 'claude'
   copyReply: boolean
   diffTint: 'soft' | 'vivid'
+  treeMark: 'hook' | 'corner'
   clock: Clock
   toolStyle: 'chat' | 'tree-dim' | 'tree-bold' | 'classic'
   toolOutput: 'full' | 'quiet'
@@ -75,6 +76,7 @@ export const resolveStyle = (options: PluginOptions): Style => {
     turnLine: pick(options.turnLine, ['themed', 'claude'] as const, 'themed'),
     copyReply: options.copyReply !== false,
     diffTint: pick(options.diffTint, ['soft', 'vivid'] as const, 'soft'),
+    treeMark: pick(options.treeMark, ['hook', 'corner'] as const, 'hook'),
     clock: pick(options.clock, ['off', '24h', '12h'] as const, 'off'),
     toolStyle: pick(options.toolStyle, ['chat', 'tree-dim', 'tree-bold', 'classic'] as const, 'chat'),
     toolOutput: pick(options.toolOutput, ['full', 'quiet'] as const, 'full'),

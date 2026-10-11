@@ -1,6 +1,6 @@
 {
   "name": "prismantis",
-  "version": "0.15.4",
+  "version": "0.15.5",
   "description": "Colorful, themeable rendering for Claude Code replies: tables, headings, code, numbers, paths and links.",
   "author": {
     "name": "Nahum Litvin",
@@ -108,6 +108,13 @@
       "description": "How tool rows (Ran, Read, Edited) sit next to Claude's sentences. chat: tool rows dimmed on the right, Claude on the left. tree-dim: tucked under the sentence with ⎿ and dimmed. tree-bold: tree-dim plus one-line sentences in bold. classic: the original look.",
       "default": "chat",
       "options": ["chat", "tree-dim", "tree-bold", "classic"]
+    },
+    "treeMark": {
+      "type": "string",
+      "title": "Tree mark",
+      "description": "The mark that tucks tool rows and results under Claude's sentence. hook: ⎿, as Claude Code draws it, which most fonts set at the bottom of the line. corner: a bold ┗, which sits in the middle of the line.",
+      "default": "hook",
+      "options": ["hook", "corner"]
     },
     "toolOutput": {
       "type": "string",
