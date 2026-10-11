@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
+## [0.14.2] - 2026-10-11
+
+### Fixed
+
+- After a resume, an old prompt row or turn line no longer takes a newer time. `clock` drops `24h-seconds`: pick `24h` or `12h`.
+
 ## [0.14.1] - 2026-10-10
 
 ### Added
