@@ -1,6 +1,6 @@
 {
   "name": "prismantis",
-  "version": "0.15.6",
+  "version": "0.15.7",
   "description": "Colorful, themeable rendering for Claude Code replies: tables, headings, code, numbers, paths and links.",
   "author": {
     "name": "Nahum Litvin",
@@ -112,7 +112,7 @@
     "treeMark": {
       "type": "string",
       "title": "Tree mark",
-      "description": "The mark that tucks tool rows and results under Claude's sentence. hook: ⎿, as Claude Code draws it, which most fonts set at the bottom of the line. corner: a bold ┗, which sits in the middle of the line.",
+      "description": "The mark that tucks tool rows and results under Claude's sentence. hook: ⎿, as Claude Code draws it, which most fonts set at the bottom of the line. corner: a bold └─, which sits in the middle of the line.",
       "default": "hook",
       "options": ["hook", "corner"]
     },

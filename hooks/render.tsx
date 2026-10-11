@@ -656,7 +656,7 @@ const TARGET_FIELDS = ['file_path', 'notebook_path', 'path', 'pattern', 'url', '
 const statusColor = (t: Theme, row: ToolRow) =>
   row.isErrored ? t.codeFlag : row.isInterrupted ? t.codeComment : row.isRunning ? t.accent : t.number
 
-export const treeMark = (style: Pick<Style, 'treeMark'>) => (style.treeMark === 'corner' ? '┗' : '⎿')
+export const treeMark = (style: Pick<Style, 'treeMark'>) => (style.treeMark === 'corner' ? '└─' : '⎿')
 
 const heavyMark = (style: Pick<Style, 'treeMark'>) => style.treeMark === 'corner'
 
@@ -664,7 +664,7 @@ const toolDim = (style: Style) => style.toolStyle !== "classic"
 
 const toolGutter = ({ Box, Text }: ElementTable, style: Style, color: string | undefined, running: boolean) =>
   style.toolStyle.startsWith("tree")
-    ? <Box width={4} flexShrink={0}><Text color={color} bold={heavyMark(style)}>{`  ${treeMark(style)} `}</Text></Box>
+    ? <Box width={treeMark(style).length + 3} flexShrink={0}><Text color={color} bold={heavyMark(style)}>{`  ${treeMark(style)} `}</Text></Box>
     : <Box width={2} flexShrink={0}><Text color={color}>{running ? '◌' : '●'}</Text></Box>
 
 const toolLayout = (el: ElementTable, style: Style, columns: number, label: string, color: string | undefined, running: boolean, text: RenderElement) => {
@@ -721,7 +721,7 @@ export const renderShellResult = (el: ElementTable, style: Style, output: unknow
   const head = shown.slice(0, RESULT_LINES).map(l => shortenPaths(l, style))
   return (
     <Box flexDirection="row">
-      <Text dimColor bold={heavyMark(style)}>{`  ${treeMark(style)}  `}</Text>
+      <Text dimColor bold={heavyMark(style)}>{`  ${treeMark(style)}`.padEnd(5)}</Text>
       <Box flexDirection="column">
         {head.length === 0 ? <Text dimColor>(No output)</Text> : head.map((l, i) => <Text key={`l${i}`} wrap="truncate-end">{l === '' ? ' ' : l}</Text>)}
         {shown.length > head.length ? <Text dimColor>{`… +${shown.length - head.length} lines`}</Text> : null}
@@ -794,7 +794,7 @@ export const renderDiffCard = (el: ElementTable, style: Style, output: unknown, 
   const tints = { ...diffTints(style), ' ': undefined }
   return (
     <Box flexDirection="row">
-      <Text dimColor bold={heavyMark(style)}>{`  ${treeMark(style)}  `}</Text>
+      <Text dimColor bold={heavyMark(style)}>{`  ${treeMark(style)}`.padEnd(5)}</Text>
       <Box flexDirection="column" borderStyle="round" borderColor={t.rule} paddingX={1} flexShrink={1}>
         <Text>
           <Text color={t.number} dimColor={added === 0}>{`+${added}`}</Text>
