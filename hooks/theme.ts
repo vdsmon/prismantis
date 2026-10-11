@@ -30,6 +30,7 @@ export type Style = {
   diffSyntax: boolean
   turnClock: boolean
   diffCards: boolean
+  diffBox: boolean
   clock: Clock
   toolStyle: 'chat' | 'tree-dim' | 'tree-bold' | 'classic'
   toolOutput: 'full' | 'quiet'
@@ -87,6 +88,7 @@ export const resolveStyle = (options: PluginOptions): Style => {
     diffSyntax: options.diffSyntax === true,
     turnClock: options.turnClock !== false,
     diffCards: options.diffCards !== false,
+    diffBox: options.diffBox === true,
     clock: pick(options.clock, ['off', '24h', '12h'] as const, 'off'),
     toolStyle: pick(options.toolStyle, ['chat', 'tree-dim', 'tree-bold', 'classic'] as const, 'chat'),
     toolOutput: pick(options.toolOutput, ['full', 'quiet'] as const, 'full'),

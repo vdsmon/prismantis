@@ -1,6 +1,6 @@
 {
   "name": "prismantis",
-  "version": "0.15.12",
+  "version": "0.15.13",
   "description": "Colorful, themeable rendering for Claude Code replies: tables, headings, code, numbers, paths and links.",
   "author": {
     "name": "Nahum Litvin",
@@ -288,6 +288,12 @@
       "title": "Diff cards",
       "description": "Draw Edit and Write results as the mod's diff card. Off leaves them to Claude Code's own diff, with its colors and word highlights.",
       "default": true
+    },
+    "diffBox": {
+      "type": "boolean",
+      "title": "Box around Claude Code's diff",
+      "description": "With diffCards off, draw a rounded box around Claude Code's own diff and change nothing inside it.",
+      "default": false
     },
     "diffSyntax": {
       "type": "boolean",

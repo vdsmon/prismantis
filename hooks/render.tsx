@@ -802,6 +802,13 @@ const paintDiff = (el: ElementTable, style: Style, output: unknown, texts: strin
   return highlightBlock(el, style, texts, lang, `${id}.s`)
 }
 
+export const renderBoxed = ({ Box, Text }: ElementTable, style: Style, inner: RenderElement): RenderElement => (
+  <Box flexDirection="row">
+    <Text dimColor bold={heavyMark(style)}>{`  ${treeMark(style)}`.padEnd(5)}</Text>
+    <Box flexDirection="column" borderStyle="round" borderColor={style.theme.rule} paddingX={1} flexShrink={1}>{inner}</Box>
+  </Box>
+)
+
 export const renderDiffCard = (el: ElementTable, style: Style, output: unknown, fold: Fold, id: string): RenderElement | undefined => {
   const rows = diffLines(output)
   if (rows === undefined) return undefined
