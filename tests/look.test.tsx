@@ -4,7 +4,7 @@ import { expect, mock, test } from 'claude-code/testing'
 import { PRESETS } from '../hooks/presets'
 import { endedAt } from '../hooks/clock'
 import { withoutDelivered, withQueued } from '../hooks/queue'
-import { tint } from '../hooks/render'
+import { diffLang, tint } from '../hooks/render'
 
 const t = PRESETS['catppuccin-mocha']
 const engine = (on: On) =>
@@ -161,6 +161,33 @@ test('treeMark keeps the hook mark by default', { options: { toolStyle: 'tree-bo
   const tool = await $.ui.mount(row)
   expect(await tool.find({ type: 'Text', text: /^ {2}⎿ $/ })).toBeDefined()
   await tool.unmount()
+})
+
+test('diffSyntax colors diff card code by the file language', { options: { diffSyntax: true } }, async ($, on) => {
+  engine(on)
+  const py = { filePath: '/tmp/app.py', structuredPatch: [{ oldStart: 1, newStart: 1, lines: ['+def greet(name):', '+    return "hi"'] }] }
+  const ui = await $.ui.mount({ ...edit, props: { ...edit.props, output: py } })
+  const def = await ui.find({ type: 'Text', text: /^def$/ })
+  expect(def).toBeDefined()
+  expect(def?.props.color).not.toBe(t.codeText)
+  expect((await ui.find({ type: 'Text', text: /^"hi"$/ }))?.props.color).toBe(t.codeString)
+  await ui.unmount()
+})
+
+test('diffSyntax leaves a file of unknown language in the plain code color', { options: { diffSyntax: true } }, async ($, on) => {
+  engine(on)
+  const notes = { filePath: '/tmp/notes.txt', structuredPatch: [{ oldStart: 1, newStart: 1, lines: ['+def greet'] }] }
+  const ui = await $.ui.mount({ ...edit, props: { ...edit.props, output: notes } })
+  expect((await ui.find({ type: 'Text', text: /^def greet$/ }))?.props.color).toBe(t.codeText)
+  await ui.unmount()
+})
+
+test('diff languages come from the file extension', () => {
+  expect(diffLang('/a/b/app.py')).toBe('python')
+  expect(diffLang('src/x.TSX')).toBe('tsx')
+  expect(diffLang('/repo/Dockerfile')).toBe('docker')
+  expect(diffLang('README.md')).toBeUndefined()
+  expect(diffLang(undefined)).toBeUndefined()
 })
 
 test('diffTint vivid tints over white on a light theme', { options: { diffTint: 'vivid', theme: 'catppuccin-latte' } }, async ($, on) => {

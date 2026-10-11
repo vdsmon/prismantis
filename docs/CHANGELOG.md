@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
+## [0.15.10] - 2026-10-11
+
+### Added
+
+- `diffSyntax: true` colors the code in diff cards by its language, picked from the file's extension (Python, TypeScript, Go, Rust, shell and the other languages code blocks know).
+
 ## [0.15.9] - 2026-10-11
 
 ### Fixed
