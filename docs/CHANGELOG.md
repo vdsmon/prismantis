@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
+## [0.15.11] - 2026-10-11
+
+### Added
+
+- `turnClock: false` keeps the clock times on your prompts and leaves the turn line without one, for when Claude Code already shows when the turn ended.
+
 ## [0.15.10] - 2026-10-11
 
 ### Added

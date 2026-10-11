@@ -28,6 +28,7 @@ export type Style = {
   replyGap: boolean
   dimQueued: boolean
   diffSyntax: boolean
+  turnClock: boolean
   clock: Clock
   toolStyle: 'chat' | 'tree-dim' | 'tree-bold' | 'classic'
   toolOutput: 'full' | 'quiet'
@@ -83,6 +84,7 @@ export const resolveStyle = (options: PluginOptions): Style => {
     replyGap: options.replyGap === true,
     dimQueued: options.dimQueued === true,
     diffSyntax: options.diffSyntax === true,
+    turnClock: options.turnClock !== false,
     clock: pick(options.clock, ['off', '24h', '12h'] as const, 'off'),
     toolStyle: pick(options.toolStyle, ['chat', 'tree-dim', 'tree-bold', 'classic'] as const, 'chat'),
     toolOutput: pick(options.toolOutput, ['full', 'quiet'] as const, 'full'),

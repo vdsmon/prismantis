@@ -124,6 +124,17 @@ test('turnLine claude draws the plain gray line with the clock time on the same 
   await ui.unmount()
 })
 
+test('turnClock off leaves the turn line without a time and keeps the prompt times', { options: { turnLine: 'claude', clock: '24h', turnClock: false } }, async ($, on) => {
+  engine(on)
+  mock.clock(on, { now: local(7, 7) })
+  on('turn.complete', async (_$, e) => ({ text: e.answer }))
+  await $.turn.complete({ answer: 'done', durationMs: 5000, isAborted: false, turnId: 't1', reason: 'answer' })
+  const ui = await $.ui.mount(turnLine)
+  expect(await ui.find({ type: 'Text', text: /^engine$/ })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /07:07/ })).toBeUndefined()
+  await ui.unmount()
+})
+
 test('turnLine claude without a time leaves the engine line alone', { options: { turnLine: 'claude' } }, async ($, on) => {
   engine(on)
   const ui = await $.ui.mount(turnLine)

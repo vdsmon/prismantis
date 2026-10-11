@@ -281,6 +281,7 @@ Options sit under `options`, keyed by the plugin's install name. Project setting
 | `promptStyle` | `bubble`, `bar`, `chevron`, `off` | `bubble` |
 | `promptAlign` | `left`, `right` | `left` |
 | `clock` | `off`, `24h`, `12h` | `off` |
+| `turnClock` | `true`, `false` | `true` |
 | `turnLine` | `themed`, `claude` | `themed` |
 | `headingStyle` | `banner`, `bold`, `underline`, `uppercase` | `banner` |
 | `highlightNumbers` | `true`, `false` | `true` |
