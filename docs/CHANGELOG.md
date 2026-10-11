@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
+## [0.15.18] - 2026-10-11
+
+### Changed
+
+- With `codeStyle: box`, drawn Mermaid diagrams sit in the same rounded box as code blocks, sized to the diagram, with `mermaid` above and the copy buttons inside at the top right.
+
 ## [0.15.17] - 2026-10-11
 
 ### Changed
