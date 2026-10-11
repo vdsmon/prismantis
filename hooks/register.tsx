@@ -1,7 +1,9 @@
 import { atom, read, update } from 'claude-code'
-import type { EngineInterface, Register, RenderElement, RenderSurface } from 'claude-code'
+import type { EngineInterface, Register, RenderElement, RenderInput, RenderSurface } from 'claude-code'
 
 import { clockText, endedAt, promptKey, sentAt, withRecord } from './clock'
+import type { Table } from './tables'
+import { MAX_ROWS, PREVIEW_ROWS, captionOf, isTabular, markdownTable, tableFooter, toolTable } from './tables'
 import type { Formula } from './latex'
 import { LATEX_DPR, LATEX_FONT_PX, fitsImage, keepFormulas, mathOf, padFor, pickFormula, pngSize, ratexColor, renderedOf } from './latex'
 import type { Block } from './markdown'
@@ -275,6 +277,19 @@ const drawMarkdown = ($: EngineInterface, el: ReturnType<EngineInterface['ui']['
   return button ? [...elements, <el.Box key="reply" alignSelf="flex-end">{button}</el.Box>] : elements
 }
 
+const toolTableView = async ($: EngineInterface, e: RenderInput, style: Style, blocks: Block[], table: Table, id: string | undefined, shown: number, caption?: string): Promise<RenderElement> => {
+  const el = $.ui.resolve(e)
+  const { Box, Text } = el
+  const ms = id === undefined ? undefined : (await $.state.get({ plugin: 'prismantis', key: 'took', id })).value
+  return (
+    <Box key={`table-${id ?? caption ?? ''}`} flexDirection="column">
+      {caption === undefined ? null : <Text color={style.theme.codeComment} wrap="truncate-end">{caption}</Text>}
+      {drawMarkdown($, el, style, blocks, columnsOf(e.viewport))}
+      <Text color={style.theme.codeComment}>{tableFooter(table.rows.length, shown, ms)}</Text>
+    </Box>
+  )
+}
+
 export const register: Register = (on, options) => {
   on('engine.create', async (_$, e, next) => ({ ...(await next(e)), prismantis: { markdown: async () => undefined } }))
   if (options.enabled === false) return
@@ -292,6 +307,13 @@ export const register: Register = (on, options) => {
 
   const quiet = style.toolOutput === 'quiet'
   if (options.toolRows !== false) {
+    on('tool.call', async ($, e, next) => {
+      if (!isTabular(e.tool)) return next(e)
+      const start = await $.clock.now()
+      const ran = await next(e)
+      await $.state.set({ plugin: 'prismantis', key: 'took', id: e.tool_use_id }, (await $.clock.now()) - start)
+      return ran
+    }).catch(($, e, next) => next(e))
     on('ui.render', { component: 'ToolGroup' }, async ($, e, next) => {
       await locate($, style)
       if (quiet) for (const call of e.props.calls) if (call.tool_use_id && isReadOnlyCall(call.tool, call.input)) rememberCall(readOnlyCalls, call.tool_use_id)
@@ -299,7 +321,22 @@ export const register: Register = (on, options) => {
         for (const call of e.props.calls) if (call.tool_use_id) markExpanded(call.tool_use_id)
         return next(e)
       }
-      return renderToolGroup($.ui.resolve(e), fit(e.viewport), e.props.calls, e.props.isActive, e.viewport?.columns)
+      const row = renderToolGroup($.ui.resolve(e), fit(e.viewport), e.props.calls, e.props.isActive, e.viewport?.columns)
+      if (quiet) return row
+      const found = e.props.calls.flatMap(call => {
+        const table = call.isRunning || call.isErrored || call.isInterrupted ? null : toolTable(call.tool, call.output)
+        return table === null ? [] : [{ call, table }]
+      })
+      if (found.length === 0) return row
+      const { Box } = $.ui.resolve(e)
+      const alone = e.props.calls.length === 1
+      const tables = await Promise.all(found.map(({ call, table }) => toolTableView($, e, forSurface(fit(e.viewport), e.surface), parseCached(markdownTable(table, Math.min(table.rows.length, PREVIEW_ROWS))), table, call.tool_use_id, Math.min(table.rows.length, PREVIEW_ROWS), alone ? undefined : captionOf(call.tool, call.input))))
+      return (
+        <Box flexDirection="column">
+          {row}
+          <Box flexDirection="column" paddingLeft={2}>{tables}</Box>
+        </Box>
+      )
     })
     on('ui.render', { component: 'ToolUse' }, async ($, e, next) => {
       await locate($, style)
@@ -311,6 +348,10 @@ export const register: Register = (on, options) => {
       if ((e.props.tool === 'Edit' || e.props.tool === 'Write') && !e.props.isErrored) {
         const el = $.ui.resolve(e)
         return renderDiffCard(el, fit(e.viewport), e.props.output, folder($, el, await read($, unfolded)), e.props.tool_use_id) ?? next(e)
+      }
+      if (!e.props.isErrored && !(quiet && readOnlyCalls.has(e.props.tool_use_id))) {
+        const table = toolTable(e.props.tool, e.props.output)
+        if (table !== null && table.rows.length <= MAX_ROWS) return toolTableView($, e, forSurface(fit(e.viewport), e.surface), parseCached(markdownTable(table)), table, e.props.tool_use_id, table.rows.length)
       }
       if (!quiet) return next(e)
       await locate($, style)
