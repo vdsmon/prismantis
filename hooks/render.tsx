@@ -596,12 +596,12 @@ export const renderBlocks = (el: ElementTable, style: Style, blocks: Block[], co
           return (
             <Box key={key} flexDirection="column">
               {note ? <Text color={t.codeComment}>{note}</Text> : null}
+              <Text color={t.codeComment}>{` ${block.lang || 'code'}`}</Text>
               <Box flexDirection="column" borderStyle="round" borderColor={t.rule} paddingX={1}>
-                <Box flexDirection="row" justifyContent="space-between" columnGap={4}>
-                  <Text color={t.codeComment}>{block.lang || 'code'}</Text>
+                <Box flexDirection="row" columnGap={2}>
+                  <Box flexDirection="column" flexGrow={1} flexShrink={1}>{body}</Box>
                   {copy?.(source, `copy${b}`) ?? null}
                 </Box>
-                {body}
                 {toggle?.element ?? null}
               </Box>
             </Box>

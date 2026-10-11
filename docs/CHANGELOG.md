@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
+## [0.15.16] - 2026-10-11
+
+### Changed
+
+- `codeStyle: box` puts the language just above the box and the copy button inside it, at the top right next to the first line.
+
 ## [0.15.15] - 2026-10-11
 
 ### Added
