@@ -1,6 +1,6 @@
 {
   "name": "prismantis",
-  "version": "0.15.5",
+  "version": "0.15.6",
   "description": "Colorful, themeable rendering for Claude Code replies: tables, headings, code, numbers, paths and links.",
   "author": {
     "name": "Nahum Litvin",
@@ -115,6 +115,12 @@
       "description": "The mark that tucks tool rows and results under Claude's sentence. hook: ⎿, as Claude Code draws it, which most fonts set at the bottom of the line. corner: a bold ┗, which sits in the middle of the line.",
       "default": "hook",
       "options": ["hook", "corner"]
+    },
+    "replyGap": {
+      "type": "boolean",
+      "title": "Gap before replies",
+      "description": "Put a blank line before each part of Claude's reply, so each sentence and the tool rows under it read as one block.",
+      "default": false
     },
     "toolOutput": {
       "type": "string",

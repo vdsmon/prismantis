@@ -29,6 +29,20 @@ test('copyReply off drops the copy reply button and keeps the others', { options
   await ui.unmount()
 })
 
+const marginOf = async (ui: { findAll: (q: { type: string }) => Promise<{ props: { marginTop?: unknown } }[]> }) => (await ui.findAll({ type: 'Box' }))[0]?.props.marginTop
+
+test('replyGap puts a blank line before each part of a reply', { options: { replyGap: true } }, async $ => {
+  const ui = await $.ui.mount(reply('One sentence.'))
+  expect(await marginOf(ui)).toBe(1)
+  await ui.unmount()
+})
+
+test('replies keep no gap by default', async $ => {
+  const ui = await $.ui.mount(reply('One sentence.'))
+  expect(await marginOf(ui)).toBeUndefined()
+  await ui.unmount()
+})
+
 const prompt = () => ({ plugin: 'prismantis', surface: 'terminal' as const, component: 'UserMessage' as const, props: { text: 'how many frog raids?', origin: { kind: 'composer' } as never, isExpanded: true }, viewport: { columns: 80, rows: 10 } })
 
 test('promptAlign right puts the prompt bubble on the right', { options: { promptAlign: 'right' } }, async $ => {
