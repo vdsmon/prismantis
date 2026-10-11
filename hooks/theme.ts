@@ -20,6 +20,10 @@ export type Style = {
   tableStyle: 'box' | 'rules' | 'grid' | 'minimal'
   taskStyle: 'checks' | 'ticks' | 'box' | 'progress'
   promptStyle: 'bubble' | 'bar' | 'chevron' | 'off'
+  promptAlign: 'left' | 'right'
+  turnLine: 'themed' | 'claude'
+  copyReply: boolean
+  diffTint: 'soft' | 'vivid'
   clock: Clock
   toolStyle: 'chat' | 'tree-dim' | 'tree-bold' | 'classic'
   toolOutput: 'full' | 'quiet'
@@ -67,6 +71,10 @@ export const resolveStyle = (options: PluginOptions): Style => {
     tableStyle: pick(options.tableStyle, ['box', 'rules', 'grid', 'minimal'] as const, 'box'),
     taskStyle: pick(options.taskStyle, ['checks', 'ticks', 'box', 'progress'] as const, 'checks'),
     promptStyle: pick(options.promptStyle, ['bubble', 'bar', 'chevron', 'off'] as const, 'bubble'),
+    promptAlign: pick(options.promptAlign, ['left', 'right'] as const, 'left'),
+    turnLine: pick(options.turnLine, ['themed', 'claude'] as const, 'themed'),
+    copyReply: options.copyReply !== false,
+    diffTint: pick(options.diffTint, ['soft', 'vivid'] as const, 'soft'),
     clock: pick(options.clock, ['off', '24h', '12h'] as const, 'off'),
     toolStyle: pick(options.toolStyle, ['chat', 'tree-dim', 'tree-bold', 'classic'] as const, 'chat'),
     toolOutput: pick(options.toolOutput, ['full', 'quiet'] as const, 'full'),

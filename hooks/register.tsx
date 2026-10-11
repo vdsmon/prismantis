@@ -273,7 +273,7 @@ const drawMarkdown = ($: EngineInterface, el: ReturnType<EngineInterface['ui']['
     }
   }
   const elements = renderBlocks(el, style, blocks, columns, drawn, copy, folder($, el, open))
-  const button = reply === undefined ? null : copy(reply, 'reply', '⧉ copy reply')
+  const button = reply === undefined || !style.copyReply ? null : copy(reply, 'reply', '⧉ copy reply')
   return button ? [...elements, <el.Box key="reply" alignSelf="flex-end">{button}</el.Box>] : elements
 }
 
@@ -405,10 +405,18 @@ export const register: Register = (on, options) => {
     return { text: `Theme set to random: ${themeName} for now.\nkeep it: /prismantis theme ${themeName}` }
   })
 
-  on('ui.render', { component: 'TurnDuration' }, async ($, e) => {
+  on('ui.render', { component: 'TurnDuration' }, async ($, e, next) => {
     const at = style.clock === 'off' ? undefined : endedAt(await read($, turnEnds), e.props.durationMs, await firstDrawn($, e.requestId))
     const time = at === undefined ? undefined : clockText(at, await $.clock.now(), style.clock)
-    return renderTurnDuration($.ui.resolve(e), style, e.props.word, e.props.durationMs, time)
+    if (style.turnLine === 'themed') return renderTurnDuration($.ui.resolve(e), style, e.props.word, e.props.durationMs, time)
+    if (time === undefined) return next(e)
+    const { Box, Text } = $.ui.resolve(e)
+    return (
+      <Box flexDirection="row">
+        {await next(e)}
+        <Text dimColor>{` · ${time}`}</Text>
+      </Box>
+    )
   })
 
   on('turn.complete', async ($, e, next) => {

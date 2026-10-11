@@ -1,0 +1,92 @@
+import type { On } from 'claude-code'
+import { expect, mock, test } from 'claude-code/testing'
+
+import { PRESETS } from '../hooks/presets'
+import { tint } from '../hooks/render'
+
+const t = PRESETS['catppuccin-mocha']
+const engine = (on: On) =>
+  on('ui.render', ($, e) => {
+    const { Text } = $.ui.resolve(e)
+    return <Text>engine</Text>
+  })
+
+const reply = (text: string) => ({ plugin: 'prismantis', surface: 'terminal' as const, component: 'AssistantMessage' as const, props: { text, isFirstOfReply: true }, viewport: { columns: 80, rows: 20 } })
+const labels = async (ui: { findAll: (q: { type: string }) => Promise<{ props: { label?: unknown } }[]> }) => (await ui.findAll({ type: 'Button' })).map(b => b.props.label)
+const TWO_BLOCKS = 'First paragraph.\n\n```bash\nls\n```'
+
+test('a reply of several blocks gets a copy reply button by default', async $ => {
+  const ui = await $.ui.mount(reply(TWO_BLOCKS))
+  expect(await labels(ui)).toContain('⧉ copy reply')
+  await ui.unmount()
+})
+
+test('copyReply off drops the copy reply button and keeps the others', { options: { copyReply: false } }, async $ => {
+  const ui = await $.ui.mount(reply(TWO_BLOCKS))
+  const found = await labels(ui)
+  expect(found).not.toContain('⧉ copy reply')
+  expect(found.length).toBeGreaterThan(0)
+  await ui.unmount()
+})
+
+const prompt = () => ({ plugin: 'prismantis', surface: 'terminal' as const, component: 'UserMessage' as const, props: { text: 'how many frog raids?', origin: { kind: 'composer' } as never, isExpanded: true }, viewport: { columns: 80, rows: 10 } })
+
+test('promptAlign right puts the prompt bubble on the right', { options: { promptAlign: 'right' } }, async $ => {
+  const ui = await $.ui.mount(prompt())
+  const bubble = (await ui.findAll({ type: 'Box' })).find(b => b.props.borderStyle === 'round')
+  expect(bubble?.props.alignSelf).toBe('flex-end')
+  await ui.unmount()
+})
+
+test('promptAlign right with a bar prompt pushes the row to the right', { options: { promptAlign: 'right', promptStyle: 'bar' } }, async $ => {
+  const ui = await $.ui.mount(prompt())
+  expect((await ui.findAll({ type: 'Box' })).some(b => b.props.justifyContent === 'flex-end')).toBe(true)
+  await ui.unmount()
+})
+
+test('prompts stay on the left by default', async $ => {
+  const ui = await $.ui.mount(prompt())
+  const bubble = (await ui.findAll({ type: 'Box' })).find(b => b.props.borderStyle === 'round')
+  expect(bubble?.props.alignSelf).toBe('flex-start')
+  await ui.unmount()
+})
+
+const local = (h: number, m: number) => new Date(2026, 9, 10, h, m).getTime()
+const turnLine = { plugin: 'prismantis', surface: 'terminal' as const, component: 'TurnDuration' as const, props: { word: 'Crunched', durationMs: 5000 } }
+
+test('turnLine claude keeps the engine line and adds the clock time', { options: { turnLine: 'claude', clock: '24h' } }, async ($, on) => {
+  engine(on)
+  mock.clock(on, { now: local(7, 7) })
+  on('turn.complete', async (_$, e) => ({ text: e.answer }))
+  await $.turn.complete({ answer: 'done', durationMs: 5000, isAborted: false, turnId: 't1', reason: 'answer' })
+  const ui = await $.ui.mount(turnLine)
+  expect(await ui.find({ type: 'Text', text: /^engine$/ })).toBeDefined()
+  expect((await ui.find({ type: 'Text', text: /^ · 07:07$/ }))?.props.dimColor).toBe(true)
+  await ui.unmount()
+})
+
+test('turnLine claude without a time leaves the engine line alone', { options: { turnLine: 'claude' } }, async ($, on) => {
+  engine(on)
+  const ui = await $.ui.mount(turnLine)
+  expect(await ui.find({ type: 'Text', text: /^engine$/ })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /·/ })).toBeUndefined()
+  await ui.unmount()
+})
+
+const patch = { filePath: '/tmp/app.ts', structuredPatch: [{ oldStart: 4, newStart: 4, lines: [' const a = 1', '-const b = 2', '+const b = 3'] }] }
+const edit = { plugin: 'prismantis', surface: 'terminal' as const, component: 'ToolResult' as const, props: { tool_use_id: 'd1', tool: 'Edit', output: patch, isErrored: false } }
+
+test('diffTint vivid tints changed lines over black on a dark theme', { options: { diffTint: 'vivid' } }, async ($, on) => {
+  engine(on)
+  const ui = await $.ui.mount(edit)
+  expect((await ui.find({ type: 'Box', text: /^5 \+ const b = 3$/ }))?.props.backgroundColor).toBe(tint('#000000', t.number, 0.3))
+  expect((await ui.find({ type: 'Box', text: /^5 - const b = 2$/ }))?.props.backgroundColor).toBe(tint('#000000', t.codeFlag, 0.3))
+  await ui.unmount()
+})
+
+test('diffTint vivid tints over white on a light theme', { options: { diffTint: 'vivid', theme: 'catppuccin-latte' } }, async ($, on) => {
+  engine(on)
+  const ui = await $.ui.mount(edit)
+  expect((await ui.find({ type: 'Box', text: /^5 \+ const b = 3$/ }))?.props.backgroundColor).toBe(tint('#ffffff', PRESETS['catppuccin-latte'].number, 0.3))
+  await ui.unmount()
+})

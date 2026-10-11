@@ -2,6 +2,15 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
+## [0.15.4] - 2026-10-11
+
+### Added
+
+- `promptAlign: right` puts the prompts you type on the right side of the transcript, like a chat.
+- `turnLine: claude` keeps Claude Code's own `✻ Baked for 5s` line, with the clock time added when `clock` is on.
+- `copyReply: false` drops the copy reply button under replies and keeps the other copy buttons.
+- `diffTint: vivid` gives added and removed lines in diff cards a stronger green and red background.
+
 ## [0.15.3] - 2026-10-11
 
 ### Added
