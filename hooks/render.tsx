@@ -780,6 +780,28 @@ export const diffLines = (output: unknown): DiffLine[] | undefined => {
   return rows
 }
 
+const EXT_LANGS: Record<string, string> = {
+  py: 'python', ts: 'typescript', mts: 'typescript', cts: 'typescript', tsx: 'tsx', js: 'javascript', mjs: 'javascript', cjs: 'javascript', jsx: 'jsx',
+  json: 'json', yaml: 'yaml', yml: 'yaml', toml: 'toml', go: 'go', rs: 'rust', rb: 'ruby', java: 'java', kt: 'kotlin', kts: 'kotlin',
+  swift: 'swift', c: 'c', h: 'c', cpp: 'cpp', cc: 'cpp', hpp: 'cpp', cs: 'csharp', css: 'css', html: 'html', xml: 'xml', svg: 'svg',
+  sql: 'sql', tf: 'hcl', hcl: 'hcl', sh: 'bash', bash: 'bash', zsh: 'bash',
+}
+
+export const diffLang = (path: unknown): string | undefined => {
+  if (typeof path !== 'string') return undefined
+  const name = path.split(/[\\/]/).pop() ?? ''
+  if (/^dockerfile$/i.test(name)) return 'docker'
+  const ext = /\.([^.]+)$/.exec(name)?.[1]?.toLowerCase()
+  return ext === undefined ? undefined : EXT_LANGS[ext]
+}
+
+const paintDiff = (el: ElementTable, style: Style, output: unknown, texts: string[], id: string): RenderElement[] | null => {
+  const lang = diffLang((output as { filePath?: unknown } | null)?.filePath)
+  if (lang === undefined) return null
+  if (isShellLang(lang)) return texts.map((text, i) => codeLine(el, style, text === '' ? ' ' : text, lang, `${id}.s${i}`))
+  return highlightBlock(el, style, texts, lang, `${id}.s`)
+}
+
 export const renderDiffCard = (el: ElementTable, style: Style, output: unknown, fold: Fold, id: string): RenderElement | undefined => {
   const rows = diffLines(output)
   if (rows === undefined) return undefined
@@ -792,6 +814,7 @@ export const renderDiffCard = (el: ElementTable, style: Style, output: unknown, 
   const gutter = String(Math.max(0, ...shown.map(r => r.num))).length
   const color = (mark: DiffLine['mark']) => (mark === '+' ? t.number : mark === '-' ? t.codeFlag : undefined)
   const tints = { ...diffTints(style), ' ': undefined }
+  const painted = style.diffSyntax ? paintDiff(el, style, output, shown.map(r => r.text), id) : null
   return (
     <Box flexDirection="row">
       <Text dimColor bold={heavyMark(style)}>{`  ${treeMark(style)}`.padEnd(5)}</Text>
@@ -807,7 +830,7 @@ export const renderDiffCard = (el: ElementTable, style: Style, output: unknown, 
             <Box key={`d${i}`} flexDirection="row" {...(bg ? { backgroundColor: bg } : {})}>
               <Text dimColor>{`${String(r.num).padStart(gutter)} `}</Text>
               <Text color={color(r.mark)} dimColor={r.mark === ' '}>{`${r.mark} `}</Text>
-              <Text color={bg ? t.codeText : color(r.mark)} dimColor={r.mark === ' '}>{r.text === '' ? ' ' : r.text}</Text>
+              {painted?.[i] ? <Text dimColor={r.mark === ' '}>{painted[i]}</Text> : <Text color={bg ? t.codeText : color(r.mark)} dimColor={r.mark === ' '}>{r.text === '' ? ' ' : r.text}</Text>}
             </Box>
           )
         })}
